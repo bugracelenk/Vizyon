@@ -1,6 +1,6 @@
-# vue-spa
+# Vizyon
 
-> A Vue.js project
+> One Page Cinema Ticket App
 
 ## Build Setup
 
