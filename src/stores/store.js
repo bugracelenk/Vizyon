@@ -3,14 +3,18 @@ import service from '../services/service';
 const state = {
     movies : [],
     movieDetails : {},
-    movieTimes : {}
+    movieTimes : {},
+    ticketPrices : [],
+    selectedMovieId : null,
 };
 
 const getters = {
     movies(state){
         return state.movies;
     },
-
+    times(state){
+        return state.movieTimes;
+    },
     groupMovies(){
         const grouped = [];
 
@@ -37,6 +41,12 @@ const mutations = {
     setMovieTimes(state, payload){
         const {id, data } = payload;
         state.movieTimes[id] = data;
+    },
+    setSelectedMovieId(state, id){
+        state.selectedMovieId = id;
+    },
+    setTicketPrices(state, prices){
+        state.ticketPrices = prices;
     }
 };
 
@@ -54,6 +64,16 @@ const actions = {
     fetchMovieTimes(context, id){
         return service.fetchMovieTimes(id).then((snapshot) => {
             context.commit('setMovieTimes', {id:id, data: snapshot.val()});
+        });
+    },
+    fetchTicketPrices(context){
+        return service.fetchTicketPrices().then((snapshot) => {
+            context.commit('setTicketPrices', snapshot.val());
+        });
+    },
+    fetchTicketingInfo(context,id){
+        return context.dispatch('fetchTicketPrices').then(() => {
+            return context.dispatch('fetchMovieTimes', id);
         });
     }
 };
