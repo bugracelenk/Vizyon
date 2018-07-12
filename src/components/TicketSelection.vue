@@ -13,32 +13,43 @@ export default {
             selectedTime : null,
             selectedTickets : [],
             hasTicketingInfo : false,
+            movieTimes : {}
         }
     },
     created(){
         this.movieId = this.$route.params.id;
         this.$store.dispatch('fetchTicketingInfo', this.movieId).then(() => {
             this.hasTicketingInfo= true;
+            this.movieTimes = this.$store.state.movieTimes[this.movieId];
             this.setTicketTypes();
         });
     },
     computed:{
         movieTimes(){
             return this.$store.state.movieTimes[this.movieId];
-            
         },
         ticketPrices(){
             return this.$store.state.ticketPrices;
-            debugger;
         },
-        ...mapGetters([
-            'times',
-        ])
+        seatSelectionPath() {
+            return `/movie/${this.movieId}/seat-selection`;
+        },
+        isTimeAndTicketCountSelected() {
+            let selected = false;
+
+            for (const key in this.selectedTickets) {
+                if (this.selectedTickets[key] > 0) {
+                selected = true;
+                }
+            }
+
+            return selected && this.selectedTime;
+        }
     },
-    
-    
-    
     methods : {
+        selectTime(time){
+            this.selectedTime = time;
+        },
         addTicket(type){
             this.selectedTickets[type] = ++ this.selectedTickets[type];
         },
@@ -53,7 +64,13 @@ export default {
             });
 
             this.selectedTickets = types;
-        }
+        },
+        navigateToSeatSelection() {
+            this.$store.commit('setSelectedTime', this.selectedTime);
+            this.$store.commit('setSelectedTicketOptions', this.selectedTickets);
+            this.$store.commit('setSelectedMovieHallId', this.movieTimes.hallId);
+            this.$router.push(this.seatSelectionPath);
+        },
     },
     components : {
         Loader,
@@ -80,10 +97,12 @@ export default {
                             <p>{{movie.overview}}</p>
                         </div>
                         <div class="movie-times">
-                            <h5>{{movieTimes.hallName}}</h5>
+                            <h5>{{this.movieTimes.hallName}}</h5>
                             <p 
-                            v-for="time in movieTimes.times"
+                            v-for="time in this.movieTimes.times"
                             :key="time.index"
+                            @click="selectTime(time)"
+                            :class="{ selected: time === selectedTime}"
                             >
                             {{time}}
                             </p>
@@ -103,9 +122,60 @@ export default {
                                 <p @click="addTicket(ticket.label)">+</p>
                             </div>
                         </div>
+                        <button
+                            @click="navigateToSeatSelection"
+                            :disabled="!isTimeAndTicketCountSelected"
+                            type="button"
+                            class="btn btn-success">Select Your Seat</button>
                     </div>
                 </div>
             </div>
         </section>
     </section>
 </template>
+
+<style>
+.movie-times p {
+  display: inline-block;
+  padding: 5px 20px;
+  border: 1px solid #FFF;
+  border-radius: 20px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+.movie-times p.selected,
+.movie-times p:hover,
+.ticket-types p:not(.disabled):hover {
+  background-color: #FFF;
+  color: #000;
+}
+.ticket-types {
+  margin-top: 30px;
+}
+.ticket-types p {
+  font-size: 22px;
+  width: 40px;
+  height: 40px;
+  border-radius: 40px;
+  border: 2px solid #FFF;
+  display: inline-block;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  top: -15px;
+}
+.ticket-types p.disabled {
+  opacity: .33;
+}
+.ticket-types .text {
+  display: inline-block;
+  width: 175px;
+  text-align: center;
+}
+.ticket-types .label {
+  display: block;
+  font-size: 24px;
+  font-weight: bold;
+}
+</style>
