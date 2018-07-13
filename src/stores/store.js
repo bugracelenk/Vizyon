@@ -4,8 +4,13 @@ const state = {
     movies : [],
     movieDetails : {},
     movieTimes : {},
+    halls: {},
+    soldTickets : {},
     ticketPrices : [],
     selectedMovieId : null,
+    selectedTime : null,
+    selectedMovieHallId : null,
+    selectedTicketCounts : null,
 };
 
 const getters = {
@@ -47,6 +52,24 @@ const mutations = {
     },
     setTicketPrices(state, prices){
         state.ticketPrices = prices;
+    },
+    setSelectedTime(state, time){
+        state.selectedTime = time;
+    },
+    setSelectedMovieHallId(state,id){
+        state.selectedMovieHallId = id;
+    },
+    setSelectedTicketOptions(state, tickets){
+        state.selectedTicketCounts = tickets;
+    },
+    setSeatingMap(state,payload){
+        const { hallId, seating } = payload;
+        state.halls[hallId] = seating;
+    },
+    setSoldTickets(state, payload){
+        const { movieId, time, tickets } = payload;
+        state.soldTickets[movieId] = state.soldTickets[movieId] || {};
+        state.soldTickets[movieId][time] = tickets;
     }
 };
 
@@ -74,6 +97,21 @@ const actions = {
     fetchTicketingInfo(context,id){
         return context.dispatch('fetchTicketPrices').then(() => {
             return context.dispatch('fetchMovieTimes', id);
+        });
+    },
+    fetchSeatMap(context, hallId){
+        return service.fetchSeating(hallId).then((snapshot) => {
+            return context.commit('setSeatingMap', { hallId, seating : snapshot.val()});
+        });
+    },
+    fetchSoldTickets(context, { movieId, time }){
+        return service.fetchSoldTickets({ movieId, time }).then((snapshot) => {
+            context.commit('setSoldTickets', { movieId, time, tickets : snapshot.val()});
+        });
+    },
+    fetchSeatingInfo(context, { movieId, time, hallId }){
+        return context.dispatch('fetchSeatMap', hallId).then(() => {
+            return context.dispatch('fetchSoldTickets', { movieId, time});
         });
     }
 };

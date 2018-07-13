@@ -1,5 +1,4 @@
 <script>
-import { mapGetters } from 'vuex';
 import MovieDetails from './MovieDetails.vue';
 import Loader from './Loader.vue';
 import BackdropImage from './BackdropImage.vue';
@@ -32,7 +31,7 @@ export default {
             return this.$store.state.ticketPrices;
         },
         seatSelectionPath() {
-            return `/movie/${this.movieId}/seat-selection`;
+            return `/movie/${this.movieId}/seat`;
         },
         isTimeAndTicketCountSelected() {
             let selected = false;
@@ -69,7 +68,7 @@ export default {
             this.$store.commit('setSelectedTime', this.selectedTime);
             this.$store.commit('setSelectedTicketOptions', this.selectedTickets);
             this.$store.commit('setSelectedMovieHallId', this.movieTimes.hallId);
-            this.$router.push(this.seatSelectionPath);
+            debugger;
         },
     },
     components : {
@@ -122,11 +121,7 @@ export default {
                                 <p @click="addTicket(ticket.label)">+</p>
                             </div>
                         </div>
-                        <button
-                            @click="navigateToSeatSelection"
-                            :disabled="!isTimeAndTicketCountSelected"
-                            type="button"
-                            class="btn btn-success">Select Your Seat</button>
+                        <a @click="navigateToSeatSelection" :href="seatSelectionPath"> Select Your Seats</a>
                     </div>
                 </div>
             </div>
