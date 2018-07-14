@@ -31,7 +31,7 @@ export default {
             return this.$store.state.ticketPrices;
         },
         seatSelectionPath() {
-            return `/movie/${this.movieId}/seat`;
+            return `/movie/${this.movieId}/seat-selection`;
         },
         isTimeAndTicketCountSelected() {
             let selected = false;
@@ -68,8 +68,8 @@ export default {
             this.$store.commit('setSelectedTime', this.selectedTime);
             this.$store.commit('setSelectedTicketOptions', this.selectedTickets);
             this.$store.commit('setSelectedMovieHallId', this.movieTimes.hallId);
-            debugger;
-        },
+            this.$router.push(`/movie/${this.movieId}/seat-selection`);
+            },
     },
     components : {
         Loader,
@@ -121,7 +121,7 @@ export default {
                                 <p @click="addTicket(ticket.label)">+</p>
                             </div>
                         </div>
-                        <a @click="navigateToSeatSelection" :href="seatSelectionPath"> Select Your Seats</a>
+                        <button@click="navigateToSeatSelection" class="btn btn-success"> Select Your Seats</button>
                     </div>
                 </div>
             </div>

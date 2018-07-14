@@ -1,16 +1,17 @@
 import service from '../services/service';
 
 const state = {
-    movies : [],
-    movieDetails : {},
-    movieTimes : {},
+    movies: [],
+    movieDetails: {},
     halls: {},
-    soldTickets : {},
-    ticketPrices : [],
-    selectedMovieId : null,
-    selectedTime : null,
-    selectedMovieHallId : null,
-    selectedTicketCounts : null,
+    movieTimes: {},
+    ticketPrices: [],
+    soldTickets: {},
+    selectedMovieId: null,
+    selectedTime: null,
+    selectedTicketCounts: null,
+    selectedMovieHallId: null,
+    selectedSeats: null,
 };
 
 const getters = {
@@ -70,6 +71,9 @@ const mutations = {
         const { movieId, time, tickets } = payload;
         state.soldTickets[movieId] = state.soldTickets[movieId] || {};
         state.soldTickets[movieId][time] = tickets;
+    },
+    setSelectedSeats(state, seats){
+        state.selectedSeats = seats;
     }
 };
 
